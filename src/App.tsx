@@ -8,12 +8,13 @@ const Work = lazy(() => import("./pages/Work"));
 const Expertise = lazy(() => import("./pages/Expertise"));
 const Thinking = lazy(() => import("./pages/Thinking"));
 const Contact = lazy(() => import("./pages/Contact"));
+const PiqueCaseStudy = lazy(() => import("./pages/PiqueCaseStudy"));
 
 function ScrollToTop() {
   const location = useLocation();
 
   useEffect(() => {
-    document.querySelector(".site-scroll")?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    document.querySelector(".site-frame")?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [location.pathname]);
 
   return null;
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/work" element={<Work />} />
+            <Route path="/work/pique" element={<PiqueCaseStudy />} />
             <Route path="/expertise" element={<Expertise />} />
             <Route path="/thinking" element={<Thinking />} />
             <Route path="/contact" element={<Contact />} />

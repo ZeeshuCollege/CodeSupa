@@ -1,12 +1,14 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PiqueModalDrawer } from "../components/PiqueModalDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+  const [isPiqueOpen, setIsPiqueOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const videoSectionRef = useRef<HTMLElement>(null);
   const showcaseStickyRef = useRef<HTMLDivElement>(null);
@@ -16,7 +18,7 @@ export default function Home() {
   const ctaPanelRef = useRef<HTMLElement>(null);
   const ctaImageRef = useRef<HTMLImageElement>(null);
   const secondaryPanelRef = useRef<HTMLElement>(null);
-  const secondaryImagesRef = useRef<HTMLImageElement[]>([]);
+  const secondaryImagesRef = useRef<(HTMLImageElement | HTMLVideoElement)[]>([]);
   const globePanelRef = useRef<HTMLElement>(null);
   const globeImageRef = useRef<HTMLImageElement>(null);
   const videoSource = "/media/Vid-1.mp4";
@@ -49,8 +51,8 @@ export default function Home() {
           const initialWidth = window.innerWidth - sideMargin;
           const initialHeight = Math.min(window.innerWidth * 0.58, 720);
           const initialRadius = isMobile ? 18 : 28;
-          const targetWidth = window.innerWidth;
-          const targetHeight = window.innerHeight;
+          const targetWidth = Math.max(window.innerWidth, document.documentElement.clientWidth);
+          const targetHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
 
           return {
             initialWidth,
@@ -68,6 +70,8 @@ export default function Home() {
 
         const bgTargets = [scrollerEl, stageEl, bodyEl, htmlEl].filter(Boolean);
 
+        gsap.set(bgTargets, { backgroundColor: "#f3f3e9" });
+
         const setupScrollAnimation = () => {
           const { initialWidth, initialHeight, initialRadius, targetWidth, targetHeight } = getBounds();
 
@@ -82,45 +86,49 @@ export default function Home() {
             scrollTrigger: {
               trigger: videoSectionRef.current,
               scroller: scroller,
-              start: "top top",
+              start: "top 75%",
               end: "bottom bottom",
-              scrub: 0.8,
+              scrub: 0.6,
               invalidateOnRefresh: true
             }
           });
 
-          // 1. Expand smoothly to cover the whole screen (bezelless)
+          // 1. Zoom in: starts dynamically as user scrolls down and reaches full bleed exactly at top: 0
           tl.to(videoPlayerRef.current, {
             width: `${targetWidth}px`,
             height: `${targetHeight}px`,
             borderRadius: "0px",
             boxShadow: "none",
-            ease: "power2.inOut",
-            duration: 0.42
+            ease: "none",
+            duration: 0.50
           }, 0)
-          // As video covers the screen, transition the root canvas background to #B488F1
+          // Smoothly transition background to purple as video covers full bleed
           .fromTo(bgTargets,
             { backgroundColor: "#f3f3e9" },
             {
               backgroundColor: "#B488F1",
-              duration: 0.22,
-              ease: "power1.inOut"
+              ease: "none",
+              duration: 0.25
             },
-            0.32
+            0.25
           )
-          // 2. Hold full screen while user scrolls through the showcase
+          // 2. COMPLETELY COVER SCREEN: hold full bleed (100vw x 100vh, 0px radius) with NO purple border
           .to(videoPlayerRef.current, {
-            duration: 0.16
-          }, 0.42)
-          // 3. Smoothly contract back to normal size (zoom out) against the seamless purple background
+            width: `${targetWidth}px`,
+            height: `${targetHeight}px`,
+            borderRadius: "0px",
+            ease: "none",
+            duration: 0.15
+          }, 0.50)
+          // 3. Zoom out + scroll down simultaneously: contracts back to card size as page scrolls into statement
           .to(videoPlayerRef.current, {
             width: `${initialWidth}px`,
             height: `${initialHeight}px`,
             borderRadius: `${initialRadius}px`,
             boxShadow: "none",
-            ease: "power2.inOut",
-            duration: 0.42
-          }, 0.58);
+            ease: "none",
+            duration: 0.35
+          }, 0.65);
 
           return tl;
         };
@@ -177,76 +185,109 @@ export default function Home() {
           onLeaveBack: () => logoLoop.pause(0)
         });
 
+        // 1. First full-width image (Nature) - balanced, refined parallax & scale (+20% tuned)
         if (ctaPanelRef.current && ctaImageRef.current) {
           gsap.fromTo(
             ctaImageRef.current,
-            { yPercent: -12 },
+            { yPercent: -6.3, scale: 1.054 },
             {
-              yPercent: 12,
+              yPercent: 6.3,
+              scale: 1.0,
               ease: "none",
               scrollTrigger: {
                 trigger: ctaPanelRef.current,
                 scroller,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: true,
+                scrub: 0.85,
                 invalidateOnRefresh: true
               }
             }
           );
         }
 
-        if (ctaPanelRef.current) {
-          gsap.fromTo(
-            bgTargets,
-            { backgroundColor: "#f3f3e9" },
-            {
-              backgroundColor: "#b488f1",
-              ease: "none",
-              scrollTrigger: {
-                trigger: ctaPanelRef.current,
-                scroller,
-                start: "top 90%",
-                end: "top 35%",
-                scrub: 0.8,
-                invalidateOnRefresh: true
-              }
+        if (logoStripRef.current) {
+          ScrollTrigger.create({
+            trigger: logoStripRef.current,
+            scroller,
+            start: "bottom top",
+            onEnter: () => {
+              gsap.to(bgTargets, {
+                backgroundColor: "#f3f3e9",
+                duration: 0.55,
+                ease: "power2.out",
+                overwrite: "auto"
+              });
+            },
+            onLeaveBack: () => {
+              gsap.to(bgTargets, {
+                backgroundColor: "#B488F1",
+                duration: 0.55,
+                ease: "power2.out",
+                overwrite: "auto"
+              });
             }
-          );
+          });
         }
 
+        // 2 & 3. Split dual images (Jungle Woods & Layers) - balanced depth parallax (+20% tuned)
         if (secondaryPanelRef.current && secondaryImagesRef.current.length) {
-          gsap.fromTo(
-            secondaryImagesRef.current,
-            { yPercent: -12 },
-            {
-              yPercent: 12,
-              ease: "none",
-              scrollTrigger: {
-                trigger: secondaryPanelRef.current,
-                scroller,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-                invalidateOnRefresh: true
+          if (secondaryImagesRef.current[0]) {
+            gsap.fromTo(
+              secondaryImagesRef.current[0],
+              { yPercent: -6.3, scale: 1.054 },
+              {
+                yPercent: 6.3,
+                scale: 1.0,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: secondaryPanelRef.current,
+                  scroller,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 0.85,
+                  invalidateOnRefresh: true
+                }
               }
-            }
-          );
+            );
+          }
+
+          if (secondaryImagesRef.current[1]) {
+            gsap.fromTo(
+              secondaryImagesRef.current[1],
+              { yPercent: -4.5, scale: 1.0 },
+              {
+                yPercent: 6.9,
+                scale: 1.054,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: secondaryPanelRef.current,
+                  scroller,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 0.9,
+                  invalidateOnRefresh: true
+                }
+              }
+            );
+          }
         }
 
+        // 4. Globe image - balanced floating parallax & zoom (+20% tuned)
         if (globePanelRef.current && globeImageRef.current) {
           gsap.fromTo(
             globeImageRef.current,
-            { yPercent: -12 },
+            { yPercent: -6.3, scale: 1.054 },
             {
-              yPercent: 12,
+              yPercent: 6.3,
+              scale: 1.0,
               ease: "none",
               scrollTrigger: {
                 trigger: globePanelRef.current,
                 scroller,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: true,
+                scrub: 0.85,
                 invalidateOnRefresh: true
               }
             }
@@ -347,17 +388,53 @@ export default function Home() {
 
       <section ref={ctaPanelRef} className="cta-panel">
         <img ref={ctaImageRef} className="cta-panel__image" src="/media/Nature.jpg" alt="Nature" />
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsPiqueOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setIsPiqueOpen(true);
+            }
+          }}
+          className="pique-mockup-frame"
+          style={{ cursor: "pointer" }}
+          aria-label="Open PIQUE case study popup"
+        >
+          <video
+            className="pique-mockup-video"
+            src="/media/Vid-2.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label="PIQUE case study walkthrough"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsPiqueOpen(true)}
+          className="cta-panel__brand-tag cta-panel__brand-tag--btn"
+          aria-label="Open PIQUE project popup"
+        >
+          PIQUE
+        </button>
       </section>
 
       <section ref={secondaryPanelRef} className="cta-panel cta-panel--split">
         <div className="cta-panel__half">
-          <img
+          <video
             ref={element => {
               if (element) secondaryImagesRef.current[0] = element;
             }}
-            className="cta-panel__image"
-            src="/media/Jungle%20Woods.jpg"
-            alt="Jungle woods"
+            className="cta-panel__image cta-panel__video"
+            src="/media/Ref-V2.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label="Sussex Taps craftsmanship video"
           />
         </div>
         <div className="cta-panel__half">
@@ -379,6 +456,12 @@ export default function Home() {
       <section className="closing-statement" aria-label="Closing statement">
         <h2 className="display">Great work for<br />great <span aria-hidden="true">☺</span> people.</h2>
       </section>
+
+      {/* PIQUE Case Study Popup Drawer */}
+      <PiqueModalDrawer
+        isOpen={isPiqueOpen}
+        onClose={() => setIsPiqueOpen(false)}
+      />
     </div>
   );
 }

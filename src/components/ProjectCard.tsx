@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 
 type Project = {
@@ -7,10 +8,11 @@ type Project = {
   note: string;
   accent: string;
   index: string;
+  href?: string;
 };
 
 export function ProjectCard({ project }: { project: Project }) {
-  return (
+  const card = (
     <article className={`project-card project-card--${project.accent}`}>
       <div className="project-top">
         <span>{project.index}</span>
@@ -31,4 +33,6 @@ export function ProjectCard({ project }: { project: Project }) {
       </div>
     </article>
   );
+
+  return project.href ? <Link to={project.href}>{card}</Link> : card;
 }

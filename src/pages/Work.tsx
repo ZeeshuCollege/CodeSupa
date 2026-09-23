@@ -3,10 +3,19 @@ import { PageIntro } from "../components/PageIntro";
 import { ProjectCard } from "../components/ProjectCard";
 
 const projects = [
-  { client: "NOVA", title: "Launch systems for ambitious teams.", type: "Brand + Web", note: "Positioning, identity and a conversion-first web platform.", accent: "lime", index: "01" },
-  { client: "MIRA", title: "A clearer path from idea to product.", type: "Product", note: "UX strategy and a modular application experience.", accent: "ink", index: "02" },
-  { client: "ORBIT", title: "Marketing that behaves like product.", type: "Growth", note: "Content systems, landing pages and social operations.", accent: "soft", index: "03" },
-  { client: "ALTO", title: "Turning complex service into simple journeys.", type: "Web app", note: "Architecture, interface design and front-end engineering.", accent: "lime", index: "04" }
+  {
+    client: "PIQUE",
+    title: "Prefabricated, modular living for remote landscapes.",
+    type: "Brand + Web",
+    note: "Award-winning modular home digital experience and specifications.",
+    accent: "ink",
+    index: "01",
+    href: "/work/pique"
+  },
+  { client: "NOVA", title: "Launch systems for ambitious teams.", type: "Brand + Web", note: "Positioning, identity and a conversion-first web platform.", accent: "lime", index: "02" },
+  { client: "MIRA", title: "A clearer path from idea to product.", type: "Product", note: "UX strategy and a modular application experience.", accent: "soft", index: "03" },
+  { client: "ORBIT", title: "Marketing that behaves like product.", type: "Growth", note: "Content systems, landing pages and social operations.", accent: "lime", index: "04" },
+  { client: "ALTO", title: "Turning complex service into simple journeys.", type: "Web app", note: "Architecture, interface design and front-end engineering.", accent: "ink", index: "05" }
 ];
 
 export default function Work() {
