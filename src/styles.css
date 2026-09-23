@@ -1034,6 +1034,77 @@ button, input, textarea { font: inherit; }
   object-fit: cover;
 }
 
+.pique-gallery-card--hero-video {
+  background: #0d0d0d;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+}
+
+.pique-gallery-card--hero-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pique-gallery-card--video-wide {
+  background: #0d0d0d;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+}
+
+.pique-gallery-card--video-wide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Sussex Testimonial Quote */
+.sussex-case-quote {
+  padding: 56px 20px;
+  margin: 12px 0;
+}
+
+.sussex-case-quote__text {
+  font-family: var(--display-font);
+  font-size: clamp(28px, 3.4vw, 48px);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 28px 0;
+  padding: 0;
+}
+
+.sussex-case-quote__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.sussex-case-quote__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.sussex-case-quote__name {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.sussex-case-quote__role {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .pique-gallery-split {
   display: grid;
   grid-template-columns: 1fr 1fr;

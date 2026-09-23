@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PiqueModalDrawer } from "../components/PiqueModalDrawer";
+import { SussexModalDrawer } from "../components/SussexModalDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const [isPiqueOpen, setIsPiqueOpen] = useState(false);
+  const [isSussexOpen, setIsSussexOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const videoSectionRef = useRef<HTMLElement>(null);
   const showcaseStickyRef = useRef<HTMLDivElement>(null);
@@ -423,7 +425,20 @@ export default function Home() {
       </section>
 
       <section ref={secondaryPanelRef} className="cta-panel cta-panel--split">
-        <div className="cta-panel__half">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsSussexOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setIsSussexOpen(true);
+            }
+          }}
+          className="cta-panel__half"
+          style={{ cursor: "pointer" }}
+          aria-label="Open Sussex Taps case study popup"
+        >
           <video
             ref={element => {
               if (element) secondaryImagesRef.current[0] = element;
@@ -436,6 +451,17 @@ export default function Home() {
             playsInline
             aria-label="Sussex Taps craftsmanship video"
           />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsSussexOpen(true);
+            }}
+            className="cta-panel__brand-tag cta-panel__brand-tag--btn"
+            aria-label="Open Sussex Taps project popup"
+          >
+            Sussex Taps
+          </button>
         </div>
         <div className="cta-panel__half">
           <img
@@ -461,6 +487,12 @@ export default function Home() {
       <PiqueModalDrawer
         isOpen={isPiqueOpen}
         onClose={() => setIsPiqueOpen(false)}
+      />
+
+      {/* Sussex Taps Case Study Popup Drawer */}
+      <SussexModalDrawer
+        isOpen={isSussexOpen}
+        onClose={() => setIsSussexOpen(false)}
       />
     </div>
   );
