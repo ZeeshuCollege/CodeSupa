@@ -5,12 +5,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PiqueModalDrawer } from "../components/PiqueModalDrawer";
 import { SussexModalDrawer } from "../components/SussexModalDrawer";
+import { ChaleitModalDrawer } from "../components/ChaleitModalDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const [isPiqueOpen, setIsPiqueOpen] = useState(false);
   const [isSussexOpen, setIsSussexOpen] = useState(false);
+  const [isChaleitOpen, setIsChaleitOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const videoSectionRef = useRef<HTMLElement>(null);
   const showcaseStickyRef = useRef<HTMLDivElement>(null);
@@ -425,6 +427,50 @@ export default function Home() {
       </section>
 
       <section ref={secondaryPanelRef} className="cta-panel cta-panel--split">
+        {/* Chaleit Card on the left of Sussex */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsChaleitOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setIsChaleitOpen(true);
+            }
+          }}
+          className="cta-panel__half"
+          style={{ cursor: "pointer" }}
+          aria-label="Open Chaleit case study popup"
+        >
+          <img
+            ref={element => {
+              if (element) secondaryImagesRef.current[0] = element;
+            }}
+            className="cta-panel__image"
+            src="/media/Layers.jpg"
+            alt="Chaleit"
+          />
+          <div className="chaleit-mockup-frame">
+            <img
+              src="/media/chaleit-mobile.png"
+              alt="Chaleit Mobile Experience"
+              className="chaleit-mockup-image"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsChaleitOpen(true);
+            }}
+            className="cta-panel__brand-tag cta-panel__brand-tag--btn"
+            aria-label="Open Chaleit project popup"
+          >
+            Chaleit
+          </button>
+        </div>
+
+        {/* Sussex Taps Card on the right */}
         <div
           role="button"
           tabIndex={0}
@@ -441,7 +487,7 @@ export default function Home() {
         >
           <video
             ref={element => {
-              if (element) secondaryImagesRef.current[0] = element;
+              if (element) secondaryImagesRef.current[1] = element;
             }}
             className="cta-panel__image cta-panel__video"
             src="/media/Ref-V2.mp4"
@@ -463,16 +509,6 @@ export default function Home() {
             Sussex Taps
           </button>
         </div>
-        <div className="cta-panel__half">
-          <img
-            ref={element => {
-              if (element) secondaryImagesRef.current[1] = element;
-            }}
-            className="cta-panel__image"
-            src="/media/Layers.jpg"
-            alt="Layers"
-          />
-        </div>
       </section>
 
       <section ref={globePanelRef} className="cta-panel">
@@ -493,6 +529,12 @@ export default function Home() {
       <SussexModalDrawer
         isOpen={isSussexOpen}
         onClose={() => setIsSussexOpen(false)}
+      />
+
+      {/* Chaleit Case Study Popup Drawer */}
+      <ChaleitModalDrawer
+        isOpen={isChaleitOpen}
+        onClose={() => setIsChaleitOpen(false)}
       />
     </div>
   );

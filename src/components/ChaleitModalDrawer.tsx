@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { X, ChevronUp } from "lucide-react";
-import SussexCaseStudy from "../pages/SussexCaseStudy";
+import ChaleitCaseStudy from "../pages/ChaleitCaseStudy";
 
-interface SussexModalDrawerProps {
+interface ChaleitModalDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function SussexModalDrawer({ isOpen, onClose }: SussexModalDrawerProps) {
+export function ChaleitModalDrawer({ isOpen, onClose }: ChaleitModalDrawerProps) {
   const [isClosing, setIsClosing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -329,7 +329,7 @@ export function SussexModalDrawer({ isOpen, onClose }: SussexModalDrawerProps) {
       className="pique-popup-wrapper"
       aria-modal="true"
       role="dialog"
-      aria-label="Sussex Taps Case Study"
+      aria-label="Chaleit Case Study"
     >
       {/* Backdrop overlay */}
       <div
@@ -373,7 +373,7 @@ export function SussexModalDrawer({ isOpen, onClose }: SussexModalDrawerProps) {
           type="button"
           onClick={startClosing}
           className="pique-close-btn pique-close-btn--modal"
-          aria-label="Close Sussex Taps Case Study"
+          aria-label="Close Chaleit Case Study"
         >
           <X size={20} strokeWidth={2.2} />
         </button>
@@ -383,7 +383,7 @@ export function SussexModalDrawer({ isOpen, onClose }: SussexModalDrawerProps) {
           ref={scrollRef}
           className="pique-popup-scrollable"
         >
-          <SussexCaseStudy isModal={true} onClose={startClosing} />
+          <ChaleitCaseStudy isModal={true} onClose={startClosing} />
         </div>
       </div>
     </div>

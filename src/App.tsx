@@ -10,6 +10,7 @@ const Thinking = lazy(() => import("./pages/Thinking"));
 const Contact = lazy(() => import("./pages/Contact"));
 const PiqueCaseStudy = lazy(() => import("./pages/PiqueCaseStudy"));
 const SussexCaseStudy = lazy(() => import("./pages/SussexCaseStudy"));
+const ChaleitCaseStudy = lazy(() => import("./pages/ChaleitCaseStudy"));
 
 function ScrollToTop() {
   const location = useLocation();
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/work" element={<Work />} />
             <Route path="/work/pique" element={<PiqueCaseStudy />} />
             <Route path="/work/sussex-taps" element={<SussexCaseStudy />} />
+            <Route path="/work/chaleit" element={<ChaleitCaseStudy />} />
             <Route path="/expertise" element={<Expertise />} />
             <Route path="/thinking" element={<Thinking />} />
             <Route path="/contact" element={<Contact />} />

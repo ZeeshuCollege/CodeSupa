@@ -12,10 +12,27 @@ const projects = [
     index: "01",
     href: "/work/pique"
   },
-  { client: "NOVA", title: "Launch systems for ambitious teams.", type: "Brand + Web", note: "Positioning, identity and a conversion-first web platform.", accent: "lime", index: "02" },
-  { client: "MIRA", title: "A clearer path from idea to product.", type: "Product", note: "UX strategy and a modular application experience.", accent: "soft", index: "03" },
-  { client: "ORBIT", title: "Marketing that behaves like product.", type: "Growth", note: "Content systems, landing pages and social operations.", accent: "lime", index: "04" },
-  { client: "ALTO", title: "Turning complex service into simple journeys.", type: "Web app", note: "Architecture, interface design and front-end engineering.", accent: "ink", index: "05" }
+  {
+    client: "CHALEIT",
+    title: "Real security needs deep expertise and clear thinking.",
+    type: "Brand + Web",
+    note: "Digital experience and brand identity for premier cybersecurity consultancy.",
+    accent: "lime",
+    index: "02",
+    href: "/work/chaleit"
+  },
+  {
+    client: "SUSSEX TAPS",
+    title: "Master craftsmanship engineered for timeless architecture.",
+    type: "Brand + Web",
+    note: "Australian architectural tapware manufacturing and bespoke design systems.",
+    accent: "soft",
+    index: "03",
+    href: "/work/sussex-taps"
+  },
+  { client: "NOVA", title: "Launch systems for ambitious teams.", type: "Brand + Web", note: "Positioning, identity and a conversion-first web platform.", accent: "lime", index: "04" },
+  { client: "MIRA", title: "A clearer path from idea to product.", type: "Product", note: "UX strategy and a modular application experience.", accent: "soft", index: "05" },
+  { client: "ORBIT", title: "Marketing that behaves like product.", type: "Growth", note: "Content systems, landing pages and social operations.", accent: "lime", index: "06" }
 ];
 
 export default function Work() {
