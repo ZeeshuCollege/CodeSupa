@@ -27,9 +27,12 @@ function LoadingScreen() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const isAbout = location.pathname.startsWith("/about");
+
   return (
     <main className="desktop-stage">
-      <section className="site-frame" aria-label="CodeSupa website">
+      <section className={`site-frame${isAbout ? " site-frame--about" : ""}`} aria-label="CodeSupa website">
         <SiteShell />
         <ScrollToTop />
         <Suspense fallback={<LoadingScreen />}>

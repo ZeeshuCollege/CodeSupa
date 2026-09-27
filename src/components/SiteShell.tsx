@@ -60,9 +60,11 @@ export function SiteShell() {
     return () => frame.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isAbout = location.pathname.startsWith("/about");
+
   return (
     <>
-      <header className={`topbar${isScrolled ? " topbar--scrolled" : ""}`}>
+      <header className={`topbar${isScrolled ? " topbar--scrolled" : ""}${isAbout ? " topbar--about" : ""}`}>
         <NavLink to="/" className="wordmark" aria-label="CodeSupa home">
           CodeSupa
         </NavLink>
