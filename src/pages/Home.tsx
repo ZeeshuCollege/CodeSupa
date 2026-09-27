@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,6 +8,64 @@ import { SussexModalDrawer } from "../components/SussexModalDrawer";
 import { ChaleitModalDrawer } from "../components/ChaleitModalDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const whatsNewItems = [
+  {
+    id: "awa-2026",
+    tag: "Awards",
+    tagVariant: "awards",
+    image: "/media/whats-new/card-1.png",
+    date: "10.06.26",
+    titleBold: "Australian Web Awards 2026:",
+    titleText: " 4 Wins including Best in Show: Design",
+    linkText: "Read more",
+    href: "/thinking"
+  },
+  {
+    id: "trailswa-app",
+    tag: "App Launch",
+    tagVariant: "launch",
+    image: "/media/whats-new/card-2.png",
+    date: "04.06.26",
+    titleBold: "TrailsWA Mobile App:",
+    titleText: " New dedicated mobile app available on iOS and Android",
+    linkText: "Download the App",
+    href: "/work"
+  },
+  {
+    id: "webby-awards",
+    tag: "Awards",
+    tagVariant: "awards",
+    image: "/media/whats-new/card-3.png",
+    date: "08.05.26",
+    titleBold: "Global Recognition:",
+    titleText: " Two Humaan projects receive high honours",
+    linkText: "Read More",
+    href: "/thinking"
+  },
+  {
+    id: "pharmacy-777",
+    tag: "Site Launch",
+    tagVariant: "site",
+    image: "/media/whats-new/card-4.png",
+    date: "18.03.26",
+    titleBold: "Pharmacy 777:",
+    titleText: " New website for national pharmacy brand",
+    linkText: "See Case Study",
+    href: "/work"
+  },
+  {
+    id: "marvell-tile",
+    tag: "Site Launch",
+    tagVariant: "site",
+    image: "/media/whats-new/card-5.png",
+    date: "23.02.26",
+    titleBold: "Marvell Tile & Stone:",
+    titleText: " An experience for a unique architectural space",
+    linkText: "See Case Study",
+    href: "/work"
+  }
+];
 
 export default function Home() {
   const [isPiqueOpen, setIsPiqueOpen] = useState(false);
@@ -24,7 +82,15 @@ export default function Home() {
   const secondaryPanelRef = useRef<HTMLElement>(null);
   const secondaryImagesRef = useRef<(HTMLImageElement | HTMLVideoElement)[]>([]);
   const globePanelRef = useRef<HTMLElement>(null);
-  const globeImageRef = useRef<HTMLImageElement>(null);
+  const globeMediaRef = useRef<HTMLVideoElement>(null);
+  const stat100Ref = useRef<HTMLSpanElement>(null);
+  const stat15Ref = useRef<HTMLSpanElement>(null);
+  const stat80Ref = useRef<HTMLSpanElement>(null);
+  const metricsRef = useRef<HTMLDivElement>(null);
+  const whatsNewSectionRef = useRef<HTMLElement>(null);
+  const whatsNewStickyRef = useRef<HTMLDivElement>(null);
+  const whatsNewWrapperRef = useRef<HTMLDivElement>(null);
+  const whatsNewTrackRef = useRef<HTMLDivElement>(null);
   const videoSource = "/media/Vid-1.mp4";
 
   useLayoutEffect(() => {
@@ -277,10 +343,10 @@ export default function Home() {
           }
         }
 
-        // 4. Globe image - balanced floating parallax & zoom (+20% tuned)
-        if (globePanelRef.current && globeImageRef.current) {
+        // 4. Globe media video - balanced floating parallax & zoom (+20% tuned)
+        if (globePanelRef.current && globeMediaRef.current) {
           gsap.fromTo(
-            globeImageRef.current,
+            globeMediaRef.current,
             { yPercent: -6.3, scale: 1.054 },
             {
               yPercent: 6.3,
@@ -298,12 +364,167 @@ export default function Home() {
           );
         }
 
+        // 5. People First animated metrics counter (starts from 0 and reaches target on scroll)
+        if (metricsRef.current) {
+          const stats = { count100: 0, count15: 0, count80: 0 };
+          gsap.to(stats, {
+            count100: 100,
+            count15: 15,
+            count80: 80,
+            duration: 1.8,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: metricsRef.current,
+              scroller,
+              start: "top 88%",
+              once: true
+            },
+            onUpdate: () => {
+              if (stat100Ref.current) stat100Ref.current.textContent = `${Math.round(stats.count100)}%`;
+              if (stat15Ref.current) stat15Ref.current.textContent = `${Math.round(stats.count15)}`;
+              if (stat80Ref.current) stat80Ref.current.textContent = `${Math.round(stats.count80)}+`;
+            }
+          });
+        }
+
+        // 6. What's New Humaan-style scroll-driven horizontal gallery
+        let whatsNewTimeline: gsap.core.Timeline | null = null;
+
+        const setupWhatsNewScroll = () => {
+          if (!whatsNewSectionRef.current || !whatsNewTrackRef.current || !whatsNewWrapperRef.current) {
+            return null;
+          }
+
+          const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          const isMobile = window.innerWidth <= 768;
+
+          const sectionEl = whatsNewSectionRef.current;
+          const trackEl = whatsNewTrackRef.current;
+          const wrapperEl = whatsNewWrapperRef.current;
+          const cards = trackEl.querySelectorAll<HTMLElement>(".whats-new-card");
+          const metas = trackEl.querySelectorAll<HTMLElement>(".whats-new-meta");
+
+          if (isReducedMotion || isMobile) {
+            sectionEl.style.height = "auto";
+            gsap.set(trackEl, { clearProps: "all" });
+            gsap.set(cards, { clearProps: "all" });
+            gsap.set(metas, { clearProps: "all" });
+            return null;
+          }
+
+          // Compute horizontal translation dynamically from overflow
+          // Account for padding on the right edge so the final card is fully visible with margin
+          const paddingRight = window.innerWidth <= 860 ? 24 : 42;
+          const maxTranslate = Math.max(0, trackEl.scrollWidth - wrapperEl.clientWidth + paddingRight);
+
+          // Proportional vertical scroll space with sensible multiplier so motion feels premium
+          const scrollDistance = Math.max(maxTranslate * 1.35, window.innerHeight * 1.25);
+          sectionEl.style.height = `${window.innerHeight + scrollDistance}px`;
+
+          // Initial visual states: cards at scale 1.0, text slightly compressed and masked
+          gsap.set(cards, { scale: 1.0 });
+          gsap.set(metas, {
+            y: 22,
+            opacity: 0.15,
+            clipPath: "inset(0% 0% 85% 0%)"
+          });
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionEl,
+              scroller: scroller,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 0.7,
+              invalidateOnRefresh: true
+            }
+          });
+
+          // Main horizontal translation across entire pinned journey
+          tl.to(
+            trackEl,
+            {
+              x: -maxTranslate,
+              ease: "power1.inOut",
+              duration: 1
+            },
+            0
+          );
+
+          // Card subtle scale/shrink effect (1.0 -> 0.92) across scroll
+          tl.to(
+            cards,
+            {
+              scale: 0.92,
+              ease: "power1.out",
+              duration: 0.8
+            },
+            0.05
+          );
+
+          // Spatial text reveal beneath each card (unmasks and floats into position)
+          tl.to(
+            metas,
+            {
+              y: 0,
+              opacity: 1,
+              clipPath: "inset(0% 0% 0% 0%)",
+              ease: "power2.out",
+              duration: 0.45
+            },
+            0.06
+          );
+
+          // Smooth background color transition: seamlessly blends from canvas beige (#f3f3e9) to white (#ffffff)
+          // as the later cards scroll across and the section transitions into the footer
+          tl.fromTo(
+            [sectionEl, ...bgTargets],
+            { backgroundColor: "#f3f3e9" },
+            {
+              backgroundColor: "#ffffff",
+              ease: "power2.inOut",
+              duration: 0.44
+            },
+            0.56
+          );
+
+          return tl;
+        };
+
+        whatsNewTimeline = setupWhatsNewScroll();
+
+        // Ensure calculations update once images complete loading
+        const trackImages = whatsNewTrackRef.current?.querySelectorAll("img");
+        trackImages?.forEach((img) => {
+          if (!img.complete) {
+            img.addEventListener(
+              "load",
+              () => {
+                if (whatsNewTimeline) {
+                  whatsNewTimeline.scrollTrigger?.kill();
+                  whatsNewTimeline.kill();
+                }
+                whatsNewTimeline = setupWhatsNewScroll();
+                ScrollTrigger.refresh();
+              },
+              { once: true }
+            );
+          }
+        });
+
         const handleResize = () => {
           if (currentTimeline) {
             currentTimeline.scrollTrigger?.kill();
             currentTimeline.kill();
           }
           currentTimeline = setupScrollAnimation();
+
+          if (whatsNewTimeline) {
+            whatsNewTimeline.scrollTrigger?.kill();
+            whatsNewTimeline.kill();
+          }
+          whatsNewTimeline = setupWhatsNewScroll();
+
           ScrollTrigger.refresh();
         };
 
@@ -320,9 +541,16 @@ export default function Home() {
             currentTimeline.scrollTrigger?.kill();
             currentTimeline.kill();
           }
+          if (whatsNewTimeline) {
+            whatsNewTimeline.scrollTrigger?.kill();
+            whatsNewTimeline.kill();
+          }
           bgTargets.forEach(el => {
             if (el) (el as HTMLElement).style.backgroundColor = "";
           });
+          if (whatsNewSectionRef.current) {
+            whatsNewSectionRef.current.style.backgroundColor = "";
+          }
         };
       }
     }, ref);
@@ -512,12 +740,180 @@ export default function Home() {
       </section>
 
       <section ref={globePanelRef} className="cta-panel">
-        <img ref={globeImageRef} className="cta-panel__image" src="/media/Globe.png" alt="Globe" />
+        <video
+          ref={globeMediaRef}
+          className="cta-panel__image cta-panel__video"
+          src="/media/Ref-V6.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label="Earth video showcase"
+        />
+        <div className="surveillance-mockup-frame">
+          <img
+            src="/media/surveillance-watch.png"
+            alt="Surveillance Watch interface"
+            className="surveillance-mockup-image"
+          />
+        </div>
       </section>
 
       <section className="closing-statement" aria-label="Closing statement">
         <h2 className="display">Great work for<br />great <span aria-hidden="true">☺</span> people.</h2>
+
+        <div className="people-first-grid">
+          <div className="people-first-col">
+            <div className="people-first-copy">
+              <p>
+                We put people first, understanding that a well-crafted product
+                significantly impacts the lives of those who use it. By
+                empowering users, we&apos;re able to solve unique problems,
+                accelerate progress and unlock potential for our clients.
+              </p>
+              <p>
+                Our independent spirit drives our creative energy and approach
+                to technology, allowing us to ensure quality and consistently
+                deliver outstanding outcomes.
+              </p>
+              <Link to="/about" className="people-first-btn">
+                <span>About Us</span>
+                <ArrowRight size={17} strokeWidth={2.2} />
+              </Link>
+            </div>
+
+            <div ref={metricsRef} className="people-first-metrics">
+              <div className="metric-row">
+                <span ref={stat100Ref} className="metric-number">0%</span>
+                <span className="metric-label">
+                  In-house &amp;<br />independent
+                </span>
+              </div>
+              <div className="metric-row">
+                <span ref={stat15Ref} className="metric-number">0</span>
+                <span className="metric-label">
+                  Years crafting digital<br />experiences
+                </span>
+              </div>
+              <div className="metric-row">
+                <span ref={stat80Ref} className="metric-number">0+</span>
+                <span className="metric-label">
+                  Awards from AWA,<br />FWA, and Awwwards
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="people-first-media">
+            <img
+              src="/media/29.webp"
+              alt="CodeSupa team at work"
+              className="people-first-img"
+              loading="lazy"
+            />
+          </div>
+        </div>
       </section>
+
+      {/* What's New Section */}
+      <section ref={whatsNewSectionRef} className="whats-new-section" aria-label="What's New">
+        <div ref={whatsNewStickyRef} className="whats-new-sticky">
+          <div className="whats-new-header">
+            <h2 className="display whats-new-title">What&apos;s New</h2>
+          </div>
+
+          <div ref={whatsNewWrapperRef} className="whats-new-track-wrapper">
+            <div ref={whatsNewTrackRef} className="whats-new-track">
+              {whatsNewItems.map((item) => (
+                <article key={item.id} className="whats-new-card">
+                  <div className="whats-new-media-wrap">
+                    <img
+                      src={item.image}
+                      alt={item.titleBold}
+                      className="whats-new-img"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                    <span className={`whats-new-badge whats-new-badge--${item.tagVariant}`}>
+                      {item.tag}
+                    </span>
+                  </div>
+                  <div className="whats-new-meta">
+                    <time className="whats-new-date">{item.date}</time>
+                    <h3 className="whats-new-heading">
+                      <strong>{item.titleBold}</strong>{item.titleText}
+                    </h3>
+                    <Link to={item.href} className="whats-new-link">
+                      {item.linkText}
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Footer Section - "Let's make something original" */}
+      <footer className="home-footer" aria-label="Site footer">
+        <div className="home-footer__cta">
+          <Link to="/contact" className="home-footer__cta-link">
+            <span className="home-footer__cta-line">
+              Let&apos;s make <span className="home-footer__cta-arrow" aria-hidden="true">→</span>
+            </span>
+            <span className="home-footer__cta-line">something original</span>
+          </Link>
+        </div>
+
+        <div className="home-footer__body">
+          <div className="home-footer__locations">
+            <div className="home-footer__loc-col">
+              <div className="home-footer__loc-title">
+                <Globe size={18} strokeWidth={1.8} className="home-footer__globe-icon" />
+                <span>We work globally</span>
+              </div>
+              <Link to="/contact" className="home-footer__brief-link">
+                Submit a brief <span aria-hidden="true">→</span>
+              </Link>
+              <a href="mailto:hello@codesupa.com" className="home-footer__email">
+                hello@codesupa.com
+              </a>
+            </div>
+
+            <div className="home-footer__loc-col">
+              <h4 className="home-footer__loc-heading">USA</h4>
+              <p className="home-footer__loc-city">Los Angeles, CA</p>
+              <a href="mailto:la@codesupa.com" className="home-footer__email">
+                la@codesupa.com
+              </a>
+            </div>
+
+            <div className="home-footer__loc-col">
+              <h4 className="home-footer__loc-heading">Australia</h4>
+              <p className="home-footer__loc-city">Perth, WA</p>
+              <a href="mailto:perth@codesupa.com" className="home-footer__email">
+                perth@codesupa.com
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="home-footer__bottom">
+          <div className="home-footer__bottom-left">
+            <span className="home-footer__wordmark">CodeSupa</span>
+            <span className="home-footer__copy-meta">© 2026 Privacy</span>
+            <span className="home-footer__copy-meta">CodeSupa &amp; AI</span>
+          </div>
+
+          <div className="home-footer__socials">
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="home-footer__social-link">Twitter X</a>
+            <span className="home-footer__asterisk" aria-hidden="true">✳</span>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="home-footer__social-link">Instagram</a>
+            <span className="home-footer__asterisk" aria-hidden="true">✳</span>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="home-footer__social-link">LinkedIn</a>
+          </div>
+        </div>
+      </footer>
 
       {/* PIQUE Case Study Popup Drawer */}
       <PiqueModalDrawer
